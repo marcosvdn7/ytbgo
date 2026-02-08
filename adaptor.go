@@ -11,16 +11,16 @@ import (
 )
 
 type InnerTubeAdaptor struct {
-	context ClientContext
+	Context ClientContext
 	session *http.Client
 }
 
-func NewInnerTubeAdaptor(context ClientContext, session *http.Client) *InnerTubeAdaptor {
+func NewInnerTubeAdaptor(Context ClientContext, session *http.Client) *InnerTubeAdaptor {
 	if session == nil {
 		session = &http.Client{}
 	}
 	return &InnerTubeAdaptor{
-		context: context,
+		Context: context,
 		session: session,
 	}
 }
@@ -38,7 +38,7 @@ func (ita *InnerTubeAdaptor) buildRequest(endpoint string, params map[string]str
 	}
 
 	// 设置基于上下文的请求头
-	req.Header = ita.context.Headers()
+	req.Header = ita.Context.Headers()
 
 	// 设置查询参数
 	q := req.URL.Query()
@@ -110,7 +110,7 @@ func (ita *InnerTubeAdaptor) Dispatch(endpoint string, params map[string]string,
 	// 检查 responseData["responseContext"] 是否为 nil
 	if responseContext, ok := responseData["responseContext"].(map[string]interface{}); ok {
 		if visitorData, ok := responseContext["visitorData"].(string); ok {
-			ita.context.XGoogVisitorId = visitorData
+			ita.Context.XGoogVisitorId = visitorData
 		}
 	}
 
