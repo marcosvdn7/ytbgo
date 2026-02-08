@@ -15,7 +15,7 @@ type InnerTubeAdaptor struct {
 	session *http.Client
 }
 
-func NewInnerTubeAdaptor(Context ClientContext, session *http.Client) *InnerTubeAdaptor {
+func NewInnerTubeAdaptor(context ClientContext, session *http.Client) *InnerTubeAdaptor {
 	if session == nil {
 		session = &http.Client{}
 	}
@@ -26,7 +26,7 @@ func NewInnerTubeAdaptor(Context ClientContext, session *http.Client) *InnerTube
 }
 
 func (ita *InnerTubeAdaptor) buildRequest(endpoint string, params map[string]string, body map[string]interface{}) (*http.Request, error) {
-	body = Contextualise(ita.context, body)
+	body = Contextualise(ita.Context, body)
 	reqBody, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
