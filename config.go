@@ -21,7 +21,7 @@ const (
 
 var config = Config{
 	Host:    "https://music.youtube.com",
-	BaseURL: "https://music.youtube.com/youtubei/v1/",
+	BaseURL: "https://www.youtube.com/youtubei/v1/",
 	Clients: []ClientContext{
 		{ClientID: 1, ClientName: "WEB", ClientVersion: "2.20230728.00.00", UserAgent: USER_AGENT_WEB, Referer: REFERER_YOUTUBE, APIKey: "AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"},
 		{ClientID: 2, ClientName: "MWEB", ClientVersion: "2.20211214.00.00", UserAgent: USER_AGENT_ANDROID, Referer: REFERER_YOUTUBE_MOBILE, APIKey: "AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"},
