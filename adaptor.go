@@ -13,7 +13,6 @@ import (
 type InnerTubeAdaptor struct {
 	Context ClientContext
 	session *http.Client
-	test    string
 }
 
 func NewInnerTubeAdaptor(context ClientContext, session *http.Client) *InnerTubeAdaptor {
