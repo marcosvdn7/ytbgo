@@ -20,8 +20,8 @@ const (
 )
 
 var config = Config{
-	Host:    "youtubei.googleapis.com",
-	BaseURL: "https://youtubei.googleapis.com/youtubei/v1/",
+	Host:    "https://music.youtube.com",
+	BaseURL: "https://music.youtube.com/youtubei/v1/",
 	Clients: []ClientContext{
 		{ClientID: 1, ClientName: "WEB", ClientVersion: "2.20230728.00.00", UserAgent: USER_AGENT_WEB, Referer: REFERER_YOUTUBE, APIKey: "AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"},
 		{ClientID: 2, ClientName: "MWEB", ClientVersion: "2.20211214.00.00", UserAgent: USER_AGENT_ANDROID, Referer: REFERER_YOUTUBE_MOBILE, APIKey: "AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"},
@@ -81,5 +81,6 @@ var config = Config{
 		{ClientID: 90, ClientName: "WEB_PHONE_VERIFICATION", ClientVersion: "1.0.0", UserAgent: USER_AGENT_WEB},
 		{ClientID: 92, ClientName: "IOS_PRODUCER", ClientVersion: "0.1", UserAgent: USER_AGENT_IOS},
 		{ClientID: 93, ClientName: "TVHTML5_FOR_KIDS", ClientVersion: "7.20220325", UserAgent: USER_AGENT_TV_HTML5},
+		//{ClientID: 94, ClientName: "YTMUSIC", ClientVersion: "2.20230728.00.00", UserAgent: USER_AGENT_WEB, Referer: REFERER_YOUTUBE, APIKey: "AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"},
 	},
 }

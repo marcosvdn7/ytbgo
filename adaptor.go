@@ -25,7 +25,7 @@ func NewInnerTubeAdaptor(context ClientContext, session *http.Client) *InnerTube
 	}
 }
 
-func (ita *InnerTubeAdaptor) buildRequest(endpoint string, params map[string]string, body map[string]interface{}) (*http.Request, error) {
+func (ita *InnerTubeAdaptor) buildRequest(endpoint string, params map[string]string, body map[string]any) (*http.Request, error) {
 	body = Contextualise(ita.Context, body)
 	reqBody, err := json.Marshal(body)
 	if err != nil {
@@ -50,37 +50,28 @@ func (ita *InnerTubeAdaptor) buildRequest(endpoint string, params map[string]str
 	return req, nil
 }
 
-func (ita *InnerTubeAdaptor) request(endpoint string, params map[string]string, body map[string]interface{}) (*http.Response, error) {
+func (ita *InnerTubeAdaptor) request(endpoint string, params map[string]string, body map[string]any) (*http.Response, error) {
 	req, err := ita.buildRequest(endpoint, params, body)
-	/*
-		fmt.Println("Method: ", req.Method)
-		fmt.Println("URL: ", req.URL)
-		fmt.Println("Request Headers: ")
-		for k, v := range req.Header {
-			fmt.Println(fmt.Sprintf("%s: ", k), v)
-		}
-		//fmt.Println("Header: ", req.Header)
-		//fmt.Println("Cookies: ", req.Cookies())
-		fmt.Println("UserAgent: ", req.UserAgent())
-		//fmt.Println("Form: ", req.Form)
-		//fmt.Println("PostForm", req.PostForm)
-		fmt.Println("Body: ", req.Body)
-	*/
+
 	if err != nil {
 		return nil, err
 	}
+
 	return ita.session.Do(req)
 }
 
-func (ita *InnerTubeAdaptor) Dispatch(endpoint string, params map[string]string, body map[string]interface{}) (map[string]interface{}, error) {
+func (ita *InnerTubeAdaptor) Dispatch(endpoint string, params map[string]string, body map[string]any) (map[string]any, error) {
 	resp, err := ita.request(endpoint, params, body)
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			fmt.Println(err.Error())
+		}
+	}()
 
 	contentType := resp.Header.Get("Content-Type")
-	//fmt.Println(""resp.Body)
 	if contentType != "" && !isJSONContentType(contentType) {
 		return nil, fmt.Errorf("expected JSON response, got %q", contentType)
 	}
@@ -96,19 +87,24 @@ func (ita *InnerTubeAdaptor) Dispatch(endpoint string, params map[string]string,
 		if err != nil {
 			return nil, err
 		}
-		defer gzr.Close()
+
+		defer func() {
+			if err := gzr.Close(); err != nil {
+				fmt.Println(err.Error())
+			}
+		}()
 		reader = gzr
 	} else {
 		reader = bytes.NewReader(bodyResp)
 	}
 
-	var responseData map[string]interface{}
+	var responseData map[string]any
 	if err := json.NewDecoder(reader).Decode(&responseData); err != nil {
 		return nil, err
 	}
 
 	// 检查 responseData["responseContext"] 是否为 nil
-	if responseContext, ok := responseData["responseContext"].(map[string]interface{}); ok {
+	if responseContext, ok := responseData["responseContext"].(map[string]any); ok {
 		if visitorData, ok := responseContext["visitorData"].(string); ok {
 			ita.Context.XGoogVisitorId = visitorData
 		}

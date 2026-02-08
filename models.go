@@ -20,6 +20,13 @@ func (l *Locale) AcceptLanguage() string {
 	return strings.Join(langs, ",")
 }
 
+func NewLocale(hl, gl string) *Locale {
+	return &Locale{
+		hl: hl,
+		gl: &gl,
+	}
+}
+
 type Error struct {
 	code    int
 	message string
@@ -76,22 +83,15 @@ func (c *ClientContext) Headers() http.Header {
 	headers2.Add("X-YouTube-Client-Version", c.ClientVersion)
 	headers2.Add("Cookie", c.Cookie)
 	headers2.Add("X-Goog-Visitor-Id", c.XGoogVisitorId)
+	headers2.Add("Origin", "https://music.youtube.com")
 
-	headers := map[string]string{
-		"X-Goog-Api-Format-Version": "1",
-		"X-YouTube-Client-Name":     strconv.Itoa(c.ClientID),
-		"X-YouTube-Client-Version":  c.ClientVersion,
-	}
 	if c.UserAgent != "" {
-		headers["User-Agent"] = c.UserAgent
 		headers2.Add("User-Agent", c.UserAgent)
 	}
 	if c.Referer != "" {
-		headers["Referer"] = c.Referer
 		headers2.Add("Referer", c.Referer)
 	}
 	if c.Locale != nil {
-		headers["Accept-Language"] = c.Locale.AcceptLanguage()
 		headers2.Add("Accept-Language", c.Locale.AcceptLanguage())
 	}
 
