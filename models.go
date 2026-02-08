@@ -1,4 +1,4 @@
-package youtube_go
+package ytbgo
 
 import (
 	"fmt"
@@ -43,6 +43,7 @@ type ClientContext struct {
 	Referer        string
 	Locale         *Locale
 	XGoogVisitorId string
+	Cookie         string
 }
 
 func (c *ClientContext) Params() map[string]string {
@@ -71,12 +72,14 @@ func (c *ClientContext) Headers() http.Header {
 	headers2.Add("Connection", "keep-alive")
 	headers2.Add("Content-Type", "application/json")
 	headers2.Add("X-Goog-Api-Format-Version", "1")
-	headers2.Add("X-YouTube-Client-Name", fmt.Sprintf("%s", strconv.Itoa(c.ClientID)))
+	headers2.Add("X-YouTube-Client-Name", strconv.Itoa(c.ClientID))
 	headers2.Add("X-YouTube-Client-Version", c.ClientVersion)
+	headers2.Add("Cookie", c.Cookie)
+	headers2.Add("X-Goog-Visitor-Id", c.XGoogVisitorId)
 
 	headers := map[string]string{
 		"X-Goog-Api-Format-Version": "1",
-		"X-YouTube-Client-Name":     fmt.Sprintf("%s", strconv.Itoa(c.ClientID)),
+		"X-YouTube-Client-Name":     strconv.Itoa(c.ClientID),
 		"X-YouTube-Client-Version":  c.ClientVersion,
 	}
 	if c.UserAgent != "" {

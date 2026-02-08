@@ -1,4 +1,4 @@
-package youtube_go
+package ytbgo
 
 import (
 	"errors"
@@ -12,29 +12,31 @@ type InnerTube struct {
 
 // Adaptor interface
 type Adaptor interface {
-	Dispatch(endpoint string, params map[string]string, body map[string]interface{}) (map[string]interface{}, error)
+	Dispatch(endpoint string, params map[string]string, body map[string]any) (map[string]any, error)
 }
 
 // NewInnerTube creates a new InnerTube instance
-func NewInnerTube(httpClient *http.Client, clientName, clientVersion string, apiKey, userAgent, referer string, locale *Locale, auto bool) (*InnerTube, error) {
+func NewInnerTube(httpClient *http.Client, clientName, clientVersion string, apiKey, userAgent, referer string, locale *Locale, auto bool, cookie string, xGoogVisitorId string) (*InnerTube, error) {
 	if clientName == "" {
-		return nil, errors.New("Precondition failed: Missing client name")
+		return nil, errors.New("precondition failed: Missing client name")
 	}
 
 	if clientVersion == "" {
-		return nil, errors.New("Precondition failed: Missing client version")
+		return nil, errors.New("precondition failed: Missing client version")
 	}
-	context := ClientContext{}
+	var context ClientContext
 	if auto {
 		context = GetContext(clientName)
 	} else {
 		context = ClientContext{
-			ClientName:    clientName,
-			ClientVersion: clientVersion,
-			APIKey:        apiKey,
-			UserAgent:     userAgent,
-			Referer:       referer,
-			Locale:        locale,
+			ClientName:     clientName,
+			ClientVersion:  clientVersion,
+			APIKey:         apiKey,
+			UserAgent:      userAgent,
+			Referer:        referer,
+			Locale:         locale,
+			Cookie:         cookie,
+			XGoogVisitorId: xGoogVisitorId,
 		}
 	}
 
@@ -44,7 +46,7 @@ func NewInnerTube(httpClient *http.Client, clientName, clientVersion string, api
 }
 
 // Call method to make requests
-func (it *InnerTube) Call(endpoint string, params map[string]string, body map[string]interface{}) (map[string]interface{}, error) {
+func (it *InnerTube) Call(endpoint string, params map[string]string, body map[string]any) (map[string]any, error) {
 	response, err := it.Adaptor.Dispatch(endpoint, params, body)
 	if err != nil {
 		return nil, err
@@ -55,22 +57,22 @@ func (it *InnerTube) Call(endpoint string, params map[string]string, body map[st
 }
 
 // Example API call methods
-func (it *InnerTube) Config() (map[string]interface{}, error) {
+func (it *InnerTube) Config() (map[string]any, error) {
 	return it.Call("CONFIG", nil, nil)
 }
 
-func (it *InnerTube) Guide() (map[string]interface{}, error) {
+func (it *InnerTube) Guide() (map[string]any, error) {
 	return it.Call("GUIDE", nil, nil)
 }
 
-func (it *InnerTube) Player(videoID string) (map[string]interface{}, error) {
-	return it.Call("PLAYER", nil, Filter(map[string]interface{}{
+func (it *InnerTube) Player(videoID string) (map[string]any, error) {
+	return it.Call("PLAYER", nil, Filter(map[string]any{
 		"videoId": videoID,
 	}))
 }
 
-func (it *InnerTube) Browse(browseID *string, params *string, continuation *string) (map[string]interface{}, error) {
-	body := map[string]interface{}{
+func (it *InnerTube) Browse(browseID *string, params *string, continuation *string) (map[string]any, error) {
+	body := map[string]any{
 		"browseId":     browseID,
 		"params":       params,
 		"continuation": continuation,
@@ -80,8 +82,8 @@ func (it *InnerTube) Browse(browseID *string, params *string, continuation *stri
 	return it.Call("BROWSE", nil, Filter(body))
 }
 
-func (it *InnerTube) Search(query *string, params *string, continuation *string) (map[string]interface{}, error) {
-	body := map[string]interface{}{
+func (it *InnerTube) Search(query *string, params *string, continuation *string) (map[string]any, error) {
+	body := map[string]any{
 		"query":        query,
 		"params":       params,
 		"continuation": continuation,
@@ -91,8 +93,8 @@ func (it *InnerTube) Search(query *string, params *string, continuation *string)
 	return it.Call("SEARCH", nil, Filter(body))
 }
 
-func (it *InnerTube) Next(videoId *string, playlistId *string, params *string, index *int, continuation *string) (map[string]interface{}, error) {
-	body := map[string]interface{}{
+func (it *InnerTube) Next(videoId *string, playlistId *string, params *string, index *int, continuation *string) (map[string]any, error) {
+	body := map[string]any{
 		"videoId":       videoId,
 		"playlistId":    playlistId,
 		"params":        params,
@@ -104,8 +106,8 @@ func (it *InnerTube) Next(videoId *string, playlistId *string, params *string, i
 	return it.Call("NEXT", nil, Filter(body))
 }
 
-func (it *InnerTube) GetTranscript(params *string) (map[string]interface{}, error) {
-	body := map[string]interface{}{
+func (it *InnerTube) GetTranscript(params *string) (map[string]any, error) {
+	body := map[string]any{
 		"params": params,
 	}
 	//fmt.Println("body: ", body)
@@ -113,8 +115,8 @@ func (it *InnerTube) GetTranscript(params *string) (map[string]interface{}, erro
 	return it.Call("GET_TRANSCRIPT", nil, Filter(body))
 }
 
-func (it *InnerTube) MusicGetSearchSuggestions(input *string) (map[string]interface{}, error) {
-	body := map[string]interface{}{
+func (it *InnerTube) MusicGetSearchSuggestions(input *string) (map[string]any, error) {
+	body := map[string]any{
 		"input": input,
 	}
 	//fmt.Println("body: ", body)
@@ -122,8 +124,8 @@ func (it *InnerTube) MusicGetSearchSuggestions(input *string) (map[string]interf
 	return it.Call("MUSIC/GET_SEARCH_SUGGESTIONS", nil, Filter(body))
 }
 
-func (it *InnerTube) MusicGetQueue(videoIds *[]string, playlistId *string) (map[string]interface{}, error) {
-	body := map[string]interface{}{
+func (it *InnerTube) MusicGetQueue(videoIds *[]string, playlistId *string) (map[string]any, error) {
+	body := map[string]any{
 		"playlistId": playlistId,
 		"videoIds":   videoIds,
 	}

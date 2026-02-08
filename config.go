@@ -1,4 +1,4 @@
-package youtube_go
+package ytbgo
 
 const (
 	REFERER_YOUTUBE           = "https://www.youtube.com/"

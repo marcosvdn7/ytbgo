@@ -1,4 +1,4 @@
-package youtube_go
+package ytbgo
 
 import (
 	"bytes"
